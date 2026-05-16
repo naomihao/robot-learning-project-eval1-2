@@ -1,0 +1,145 @@
+{
+  "slug": "red_bowl",
+  "repo_id": "RobotLearningVLA/banana_red_bowl_eval1_v2",
+  "snapshot_root": "/home/htx/.cache/huggingface/hub/datasets--RobotLearningVLA--banana_red_bowl_eval1_v2/snapshots/2bd1724a6e325cd3f71ef6b10aa1b965bb45cd7b",
+  "video_path": "/home/htx/.cache/huggingface/hub/datasets--RobotLearningVLA--banana_red_bowl_eval1_v2/snapshots/2bd1724a6e325cd3f71ef6b10aa1b965bb45cd7b/videos/observation.images.front/chunk-000/file-000.mp4",
+  "image_shape_hw": [
+    480,
+    640
+  ],
+  "table_polygon": [
+    [
+      0,
+      60
+    ],
+    [
+      281,
+      43
+    ],
+    [
+      284,
+      22
+    ],
+    [
+      351,
+      20
+    ],
+    [
+      359,
+      40
+    ],
+    [
+      637,
+      35
+    ],
+    [
+      638,
+      477
+    ],
+    [
+      0,
+      478
+    ]
+  ],
+  "bowls": {
+    "green": [
+      [
+        68,
+        109
+      ],
+      [
+        70,
+        210
+      ],
+      [
+        70,
+        216
+      ],
+      [
+        184,
+        213
+      ],
+      [
+        202,
+        214
+      ],
+      [
+        206,
+        106
+      ]
+    ],
+    "blue": [
+      [
+        462,
+        102
+      ],
+      [
+        459,
+        203
+      ],
+      [
+        558,
+        211
+      ],
+      [
+        582,
+        213
+      ],
+      [
+        591,
+        212
+      ],
+      [
+        595,
+        114
+      ],
+      [
+        595,
+        113
+      ],
+      [
+        596,
+        100
+      ]
+    ],
+    "red": [
+      [
+        244,
+        241
+      ],
+      [
+        247,
+        402
+      ],
+      [
+        363,
+        409
+      ],
+      [
+        410,
+        410
+      ],
+      [
+        420,
+        409
+      ],
+      [
+        421,
+        255
+      ],
+      [
+        419,
+        238
+      ]
+    ]
+  },
+  "target_color": "red",
+  "other_colors": [
+    "blue",
+    "green"
+  ],
+  "bg_mask_pixels": 28989,
+  "target_mask_pixels": 29443,
+  "other1_mask_pixels": 14374,
+  "other2_mask_pixels": 14532
+}

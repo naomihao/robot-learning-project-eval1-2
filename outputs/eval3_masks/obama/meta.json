@@ -1,0 +1,91 @@
+{
+  "slug": "obama",
+  "sample_frame": "outputs/eval3_deep_analysis_v2/sample_frames/obama/ep00_approach_frame76.png",
+  "image_shape_hw": [
+    480,
+    640
+  ],
+  "table_polygon": [
+    [
+      0,
+      130
+    ],
+    [
+      640,
+      130
+    ],
+    [
+      640,
+      480
+    ],
+    [
+      0,
+      480
+    ]
+  ],
+  "prints": {
+    "left": [
+      [
+        20,
+        205
+      ],
+      [
+        280,
+        205
+      ],
+      [
+        280,
+        380
+      ],
+      [
+        20,
+        380
+      ]
+    ],
+    "middle": [
+      [
+        220,
+        220
+      ],
+      [
+        450,
+        220
+      ],
+      [
+        450,
+        430
+      ],
+      [
+        220,
+        430
+      ]
+    ],
+    "right": [
+      [
+        395,
+        175
+      ],
+      [
+        615,
+        175
+      ],
+      [
+        615,
+        360
+      ],
+      [
+        395,
+        360
+      ]
+    ]
+  },
+  "target_position": "right",
+  "other_positions": [
+    "left",
+    "middle"
+  ],
+  "bg_mask_pixels": 83200,
+  "target_mask_pixels": 41106,
+  "other1_mask_pixels": 45936,
+  "other2_mask_pixels": 48741
+}

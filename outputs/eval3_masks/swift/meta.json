@@ -1,0 +1,91 @@
+{
+  "slug": "swift",
+  "sample_frame": "outputs/eval3_deep_analysis_v2/sample_frames/swift/ep00_approach_frame76.png",
+  "image_shape_hw": [
+    480,
+    640
+  ],
+  "table_polygon": [
+    [
+      0,
+      105
+    ],
+    [
+      640,
+      105
+    ],
+    [
+      640,
+      480
+    ],
+    [
+      0,
+      480
+    ]
+  ],
+  "prints": {
+    "left": [
+      [
+        135,
+        95
+      ],
+      [
+        295,
+        95
+      ],
+      [
+        295,
+        200
+      ],
+      [
+        135,
+        200
+      ]
+    ],
+    "middle": [
+      [
+        270,
+        125
+      ],
+      [
+        420,
+        125
+      ],
+      [
+        420,
+        245
+      ],
+      [
+        270,
+        245
+      ]
+    ],
+    "right": [
+      [
+        410,
+        95
+      ],
+      [
+        545,
+        95
+      ],
+      [
+        545,
+        185
+      ],
+      [
+        410,
+        185
+      ]
+    ]
+  },
+  "target_position": "middle",
+  "other_positions": [
+    "left",
+    "right"
+  ],
+  "bg_mask_pixels": 67200,
+  "target_mask_pixels": 18271,
+  "other1_mask_pixels": 17066,
+  "other2_mask_pixels": 12376
+}

@@ -1,0 +1,133 @@
+{
+  "slug": "blue_bowl",
+  "repo_id": "RobotLearningVLA/banana_blue_bowl_eval1_v2",
+  "snapshot_root": "/home/htx/.cache/huggingface/hub/datasets--RobotLearningVLA--banana_blue_bowl_eval1_v2/snapshots/2c37b01a646644e63cfbc96192506583b99b4c4e",
+  "video_path": "/home/htx/.cache/huggingface/hub/datasets--RobotLearningVLA--banana_blue_bowl_eval1_v2/snapshots/2c37b01a646644e63cfbc96192506583b99b4c4e/videos/observation.images.front/chunk-000/file-000.mp4",
+  "image_shape_hw": [
+    480,
+    640
+  ],
+  "table_polygon": [
+    [
+      0,
+      60
+    ],
+    [
+      279,
+      43
+    ],
+    [
+      281,
+      24
+    ],
+    [
+      336,
+      18
+    ],
+    [
+      359,
+      37
+    ],
+    [
+      638,
+      35
+    ],
+    [
+      639,
+      478
+    ],
+    [
+      0,
+      478
+    ]
+  ],
+  "bowls": {
+    "green": [
+      [
+        67,
+        111
+      ],
+      [
+        69,
+        208
+      ],
+      [
+        68,
+        216
+      ],
+      [
+        176,
+        215
+      ],
+      [
+        201,
+        216
+      ],
+      [
+        204,
+        113
+      ],
+      [
+        200,
+        104
+      ]
+    ],
+    "blue": [
+      [
+        461,
+        97
+      ],
+      [
+        459,
+        198
+      ],
+      [
+        459,
+        205
+      ],
+      [
+        588,
+        219
+      ],
+      [
+        597,
+        107
+      ]
+    ],
+    "red": [
+      [
+        248,
+        240
+      ],
+      [
+        250,
+        409
+      ],
+      [
+        408,
+        410
+      ],
+      [
+        422,
+        410
+      ],
+      [
+        423,
+        249
+      ],
+      [
+        423,
+        239
+      ]
+    ]
+  },
+  "target_color": "blue",
+  "other_colors": [
+    "red",
+    "green"
+  ],
+  "bg_mask_pixels": 27500,
+  "target_mask_pixels": 14770,
+  "other1_mask_pixels": 29686,
+  "other2_mask_pixels": 14644
+}
