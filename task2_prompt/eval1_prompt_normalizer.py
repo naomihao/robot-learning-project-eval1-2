@@ -14,16 +14,17 @@ Prompts fall into two fundamentally different categories:
   1. Language-only (negation, color analogy) — no image needed, deterministic:
        "not red and not blue"          → green  (pure logic)
        "the color of grass"            → green  (knowledge lookup)
-     Handled by ``_try_negation()`` and ``_try_analogy()`` before touching the VLM.
+     Handled by ``_try_negation()`` and ``_try_analogy()`` without any extra model.
 
   2. Visual-spatial — requires the camera image to detect bowl layout:
        "2nd bowl from the left from the robot perspective"
        "bowl on the right of the red bowl"
      Handled by HSV color segmentation, then deterministic spatial rules.
 
-A legacy standalone SmolVLM fallback remains in this module for offline
-experiments, but the deployment CLI rejects it so evaluation uses deterministic
-prompt preprocessing only.
+Deterministic language/spatial parsing is always attempted before touching any
+model. A legacy standalone SmolVLM fallback remains in this module for offline
+experiments, but the deployment CLI rejects it so eval-day rollouts use only the
+VLA policy plus deterministic prompt preprocessing.
 
 Camera perspective (spatial prompts only)
 ------------------------------------------
@@ -102,8 +103,36 @@ def _find_color_mentions(prompt: str) -> list[str]:
     return [color for _, color in mentions]
 
 
-def _collect_excluded_colors(prompt: str) -> set[str]:
+def _analogy_color(keyword: str, color: str) -> str:
+    return "blue" if color == "lake" else color
+
+
+def _normalize_spatial_landmarks(prompt: str) -> str:
+    """Rewrite color-like landmark words so spatial rules can use them.
+
+    Example: "left of the avocado colored bowl" becomes
+    "left of the green bowl". This must only be used in spatial parsing;
+    non-spatial prompts can still use analogy rules as direct targets.
+    """
     lower = prompt.lower()
+    replacements: list[tuple[str, str]] = []
+    for color, aliases in _COLOR_ALIASES.items():
+        for alias in aliases:
+            replacements.append((alias, color))
+    for keyword, color in _ANALOGY_MAP.items():
+        replacements.append((keyword, _analogy_color(keyword, color)))
+
+    for keyword, color in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
+        lower = re.sub(
+            rf"\b{re.escape(keyword)}\b(?:\s+(?:colou?red|colou?r))?",
+            color,
+            lower,
+        )
+    return lower
+
+
+def _collect_excluded_colors(prompt: str) -> set[str]:
+    lower = _normalize_spatial_landmarks(prompt)
     excluded: set[str] = set()
     for m in _NEG_MARKERS_RE.finditer(lower):
         window = lower[m.start() : min(len(lower), m.end() + 60)]
@@ -123,7 +152,7 @@ def _collect_excluded_position_colors(
     prompt: str,
     robot_order: tuple[str, str, str],
 ) -> set[str]:
-    lower = prompt.lower()
+    lower = _normalize_spatial_landmarks(prompt)
     robot = validate_robot_order(robot_order)
     excluded: set[str] = set()
     patterns = [
@@ -173,7 +202,7 @@ def _best_effort_color(
     default_color: str | None = None,
 ) -> tuple[str, str]:
     """Choose a likely target color when strict parsing cannot resolve a prompt."""
-    lower = raw_prompt.lower()
+    lower = _normalize_spatial_landmarks(raw_prompt)
     robot = validate_robot_order(robot_order) if robot_order is not None else None
     if default_color is not None and default_color not in BOWL_COLORS:
         raise ValueError(f"default_color must be one of {BOWL_COLORS}, got {default_color!r}")
@@ -186,7 +215,7 @@ def _best_effort_color(
         if remaining:
             return _choose_from_remaining(remaining, robot), f"excluded {sorted(excluded)}"
 
-    mentions = _find_color_mentions(raw_prompt)
+    mentions = _find_color_mentions(lower)
     unique_mentions = list(dict.fromkeys(mentions))
 
     if robot is not None and mentions:
@@ -245,6 +274,7 @@ _NEG_MARKERS_RE = re.compile(
     r"\b(?:not|neither|nor|no|without|excluding|except)\b",
     re.IGNORECASE,
 )
+_NON_COLOR_RE = re.compile(r"\bnon[-\s](?:red|green|blue)\b", re.IGNORECASE)
 
 # Color knowledge: keyword → bowl color.
 # Keys are lowercase substrings to search for in the prompt.
@@ -283,6 +313,7 @@ _ANALOGY_MAP: dict[str, str] = {
     "ocean":         "blue",
     "sea":           "blue",
     "blueberry":     "blue",
+    "blueberries":   "blue",
     "sapphire":      "blue",
     "cobalt":        "blue",
     "navy":          "blue",
@@ -336,14 +367,16 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
     robot_order:
         Tuple of 3 color strings ordered left→right from the ROBOT's perspective
         (i.e. already mirrored from the image order).
-    Returns None for ambiguous prompts or unrecognised patterns → VLM fallback.
+    Returns None for ambiguous prompts or unrecognised patterns.
     """
-    lower = prompt.lower()
+    lower = _normalize_spatial_landmarks(prompt)
     robot = robot_order
 
     # Eval2 defines spatial language from the robot perspective.  Keep that
     # default even when the TA omits "from the robot perspective".
     has_robot_ctx = True
+
+    number_words = {"one": 0, "two": 1, "three": 2}
 
     def _neighbor_of(color: str, side: str) -> str | None:
         idx = robot.index(color)
@@ -370,6 +403,24 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
 
     # ── Absolute ordinal from left ────────────────────────────────────────────
     m = re.search(
+        r"\b(?:number\s+)?(one|two|three)\s+(?:bowl|one)?\s*from\s+"
+        r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?left\b",
+        lower,
+    )
+    if m and has_robot_ctx:
+        n = number_words[m.group(1)]
+        return robot[n] if 0 <= n < len(robot) else None
+
+    m = re.search(
+        r"\b(?:bowl|one)\s+number\s+(one|two|three)\s*from\s+"
+        r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?left\b",
+        lower,
+    )
+    if m and has_robot_ctx:
+        n = number_words[m.group(1)]
+        return robot[n] if 0 <= n < len(robot) else None
+
+    m = re.search(
         r"\b(\d+)(?:st|nd|rd|th)?\s+(?:bowl|one)?\s*from\s+"
         r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?left\b",
         lower,
@@ -387,12 +438,38 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
         n = {"first": 0, "second": 1, "third": 2}[m.group(1)]
         return robot[n] if 0 <= n < len(robot) else None
 
+    m = re.search(
+        r"\b(?:second|2nd|two|number\s+two)\s+from\s+"
+        r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?(?:perspective|view|side)\b",
+        lower,
+    )
+    if m and has_robot_ctx:
+        return robot[1]
+
     m = re.search(r"\b(first|second|third|1st|2nd|3rd)\s+(?:bowl|one)\b(?!\s+from)", lower)
     if m and has_robot_ctx:
         n = {"first": 0, "second": 1, "third": 2, "1st": 0, "2nd": 1, "3rd": 2}[m.group(1)]
         return robot[n] if 0 <= n < len(robot) else None
 
     # ── Absolute ordinal from right ───────────────────────────────────────────
+    m = re.search(
+        r"\b(?:number\s+)?(one|two|three)\s+(?:bowl|one)?\s*from\s+"
+        r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?right\b",
+        lower,
+    )
+    if m and has_robot_ctx:
+        n = number_words[m.group(1)]
+        return robot[-(n + 1)] if 0 <= n < len(robot) else None
+
+    m = re.search(
+        r"\b(?:bowl|one)\s+number\s+(one|two|three)\s*from\s+"
+        r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?right\b",
+        lower,
+    )
+    if m and has_robot_ctx:
+        n = number_words[m.group(1)]
+        return robot[-(n + 1)] if 0 <= n < len(robot) else None
+
     m = re.search(
         r"\b(\d+)(?:st|nd|rd|th)?\s+(?:bowl|one)?\s*from\s+"
         r"(?:the\s+)?(?:(?:robot|arm)'?s?\s+)?right\b",
@@ -499,13 +576,15 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
     for _pat, _color in (
         (
             r"\bleftmost\b|\bfar\s+left\b|\bleft[-\s]?hand\s+(?:bowl|one|side)\b|"
-            r"\bleft\s+(?:bowl|one)\b|\b(?:bowl|one)\s+on\s+the\s+left(?:\s+side)?\b(?!\s+of)|"
+            r"\bleft\s+(?:bowl|one)\b|\bleft\s+side\s+(?:bowl|one)\b|"
+            r"\b(?:bowl|one)\s+on\s+the\s+left(?:\s+side)?\b(?!\s+of)|"
             r"\bon\s+the\s+left\s+side\b(?!\s+of)",
             robot[0],
         ),
         (
             r"\brightmost\b|\bfar\s+right\b|\bright[-\s]?hand\s+(?:bowl|one|side)\b|"
-            r"\bright\s+(?:bowl|one)\b|\b(?:bowl|one)\s+on\s+the\s+right(?:\s+side)?\b(?!\s+of)|"
+            r"\bright\s+(?:bowl|one)\b|\bright\s+side\s+(?:bowl|one)\b|"
+            r"\b(?:bowl|one)\s+on\s+the\s+right(?:\s+side)?\b(?!\s+of)|"
             r"\bon\s+the\s+right\s+side\b(?!\s+of)",
             robot[-1],
         ),
@@ -521,6 +600,11 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
         if _NEG_MARKERS_RE.search(lower):
             return None   # "not in the middle" → ambiguous (two valid answers)
         return robot[1]   # RED
+
+    if re.search(r"\b(?:in\s+)?between\s+the\s+other\s+two\b", lower):
+        if _NEG_MARKERS_RE.search(lower):
+            return None
+        return robot[1]
 
     # ── not at either end → middle ────────────────────────────────────────────
     if re.search(
@@ -623,7 +707,9 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
 
     # ── adjacent to both [color1] and [color2] ────────────────────────────────
     m = re.search(
-        r"\badjacent\s+to\s+both\b.*?(red|green|blue).*?(red|green|blue)", lower
+        r"\b(?:adjacent\s+to|next\s+to|touch(?:ing|es)?)\s+both\b.*?"
+        r"(red|green|blue).*?(red|green|blue)",
+        lower,
     )
     if m:
         c1, c2 = m.group(1), m.group(2)
@@ -645,7 +731,7 @@ def _try_negation_with_spatial(prompt: str, robot_order: tuple[str, str, str]) -
     the detected layout, then excludes them alongside any explicit color exclusions.
     Returns the sole remaining color, or None.
     """
-    lower = prompt.lower()
+    lower = _normalize_spatial_landmarks(prompt)
     excluded: set[str] = set()
 
     # Collect direct color exclusions from negation markers (same as _try_negation).
@@ -697,7 +783,7 @@ def _try_direct(prompt: str) -> str | None:
     Matches 'into the green bowl', 'in the green colored bowl', 'place … in the red bowl', etc.
     Does NOT match references like 'left of the red bowl' (where red is a landmark, not target).
     """
-    if _POSITION_WORD_RE.search(prompt):
+    if _POSITION_WORD_RE.search(prompt) or _NEG_MARKERS_RE.search(prompt) or _NON_COLOR_RE.search(prompt):
         return None
 
     # Only match when the target color bowl follows "in/into/to/inside".
@@ -736,7 +822,7 @@ def _try_direct(prompt: str) -> str | None:
 
 def _try_single_target_color(prompt: str) -> str | None:
     """Infer the target when exactly one non-spatial color is mentioned."""
-    if _SPATIAL_WORD_RE.search(prompt) or _NEG_MARKERS_RE.search(prompt):
+    if _SPATIAL_WORD_RE.search(prompt) or _NEG_MARKERS_RE.search(prompt) or _NON_COLOR_RE.search(prompt):
         return None
 
     mentions = _find_color_mentions(prompt)
@@ -766,7 +852,7 @@ def _try_negation(prompt: str) -> str | None:
       "neither the color of fire nor of water"       → green  (concept: fire=red, water=blue)
       "not associated with danger or the sea"        → green  (concept: danger=red, sea=blue)
     """
-    lower = prompt.lower()
+    lower = _normalize_spatial_landmarks(prompt)
     excluded: set[str] = set()
 
     # Strategy: for every negative-marker position, collect all bowl colors
@@ -800,6 +886,12 @@ def _try_analogy(prompt: str) -> str | None:
     Also handles traffic-light go-signal and color-wheel reasoning.
     """
     lower = prompt.lower()
+
+    # If the prompt says "left/right/next/between ... avocado/sky bowl", the
+    # analogy word is a landmark, not the target. Let spatial parsing handle it
+    # after the camera/layout step.
+    if _POSITION_WORD_RE.search(lower):
+        return None
 
     # Traffic light go-signal: "traffic light when you can go" → green.
     if _TRAFFIC_GO.search(lower):
@@ -859,26 +951,23 @@ def normalize_prompt_text(
     )
 
 
-# ── VLM prompt (spatial reasoning only) ───────────────────────────────────────
+# ── VLM prompt (spatial reasoning only; legacy/offline fallback) ──────────────
 
-# This prompt is only reached when negation and analogy both fail,
-# meaning the prompt requires visual-spatial reasoning from the camera frame.
-_SPATIAL_PROMPT = """\
-The image shows a yellow banana and three colored bowls: RED, GREEN, BLUE.
-Goal: identify which BOWL (red, green, or blue) is at the described position.
-The banana is not the target — only bowls matter.
+_SPATIAL_PROMPT = """You are helping a robot choose one target bowl for a banana.
 
-Mirror rule: robot-LEFT = image-RIGHT, robot-RIGHT = image-LEFT.
+There are exactly three possible bowl colors: red, green, and blue.
+Use the image and the instruction to decide which single bowl is requested.
+Reply with a short explanation and finish with exactly one line:
 
-EXAMPLE 1 — "rightmost bowl from the robot perspective":
-  robot-rightmost → flip → image-LEFTMOST bowl → that bowl is green → ANSWER: green
+ANSWER: red
+ANSWER: green
+ANSWER: blue
 
-EXAMPLE 2 — "bowl on the right of the red bowl from the robot perspective":
-  robot-right-of-red → flip → image-left-of-red bowl → that bowl is blue → ANSWER: blue
+Instruction: {raw_prompt}
+"""
 
-Now identify the bowl for the instruction below.
-Write ONE reasoning line (robot pos → image pos → bowl color), then ANSWER: red/green/blue."""
 
+# ── HSV layout detection ──────────────────────────────────────────────────────
 
 def _to_pil(image: Union[np.ndarray, "Image.Image", "torch.Tensor"]) -> Image.Image:
     """Convert numpy HWC uint8, float CHW tensor, or PIL Image to RGB PIL."""
@@ -988,38 +1077,36 @@ def _complete_robot_order(
     return min(candidates, key=lambda item: item[0])[1]
 
 
-class PromptNormalizer:
-    """Translates a complex task description to a canonical color-based prompt.
+def _extract_color_from_reasoning(text: str) -> str | None:
+    """Extract the final red/green/blue answer from legacy VLM text output."""
+    match = re.search(r"\bANSWER\s*:\s*(red|green|blue)\b", text, flags=re.IGNORECASE)
+    if match:
+        return match.group(1).lower()
+    mentions = _find_color_mentions(text)
+    return mentions[-1] if mentions else None
 
-    Parameters
-    ----------
-    vlm:
-        ``SmolVLMForConditionalGeneration`` — either the full pretrained model or
-        the ``policy.model.vlm_with_expert.vlm`` sub-module from a SmolVLA policy.
-    processor:
-        Matching ``SmolVLMProcessor``.
-    device:
-        Where to run VLM generate inference (should match where vlm lives).
-    max_new_tokens:
-        Generation budget.  150 tokens lets the model reason step-by-step
-        before writing "ANSWER: <color>".  10 is far too short.
-    fallback_passthrough:
-        If True and the VLM output cannot be parsed, return the raw prompt unchanged
-        (the robot will try to use it as-is).  If False, raise ValueError.
+
+class PromptNormalizer:
+    """Translates an Eval1/Eval2 instruction to a canonical color prompt.
+
+    Text is handled by deterministic rules first. Task2 spatial prompts use HSV
+    color segmentation to infer the red/green/blue bowl order. A legacy/offline
+    VLM fallback can be supplied explicitly, but deployment passes ``vlm=None``.
     """
 
     def __init__(
         self,
-        vlm,
-        processor,
-        device: str | "torch.device" = "cuda",
-        max_new_tokens: int = 100,
+        *,
+        vlm=None,
+        processor=None,
+        device: str = "cuda",
+        max_new_tokens: int = 64,
         fallback_passthrough: bool = True,
         fallback_robot_order: tuple[str, str, str] | None = DEFAULT_ROBOT_ORDER,
     ) -> None:
         self._vlm = vlm
         self._processor = processor
-        self._device = torch.device(device) if torch is not None else device
+        self._device = device
         self._max_new_tokens = max_new_tokens
         self._fallback_passthrough = fallback_passthrough
         self._fallback_robot_order = (
@@ -1028,13 +1115,47 @@ class PromptNormalizer:
         # Detected bowl layout: robot perspective L→R, set by detect_layout().
         self._robot_order: tuple[str, str, str] | None = None
 
-    # ── Layout detection ───────────────────────────────────────────────────────
+    @classmethod
+    def from_policy(cls, policy, device: str | None = None, **kwargs) -> "PromptNormalizer":
+        """Use a policy's embedded SmolVLM for offline experiments."""
+        policy_model = getattr(policy, "model", None)
+        vlm_with_expert = getattr(policy_model, "vlm_with_expert", None)
+        vlm = getattr(vlm_with_expert, "vlm", None)
+        processor = getattr(vlm_with_expert, "processor", None)
+        if processor is None:
+            processor = getattr(policy, "processor", None)
+        if vlm is None or processor is None:
+            raise AttributeError("Policy does not expose a VLM and processor for prompt normalization")
+        if device is None:
+            device = getattr(getattr(policy, "config", None), "device", "cuda")
+        return cls(vlm=vlm, processor=processor, device=device, **kwargs)
+
+    @classmethod
+    def from_pretrained(
+        cls,
+        model_id: str = "HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
+        device: str = "cuda",
+        **kwargs,
+    ) -> "PromptNormalizer":
+        """Load a standalone SmolVLM normalizer for legacy/offline experiments."""
+        from transformers import AutoModelForImageTextToText, AutoProcessor
+
+        model_kwargs = {}
+        if torch is not None and str(device).startswith("cuda"):
+            model_kwargs["torch_dtype"] = torch.float16
+        vlm = AutoModelForImageTextToText.from_pretrained(model_id, **model_kwargs)
+        if hasattr(vlm, "to"):
+            vlm.to(device)
+        if hasattr(vlm, "eval"):
+            vlm.eval()
+        processor = AutoProcessor.from_pretrained(model_id)
+        return cls(vlm=vlm, processor=processor, device=device, **kwargs)
 
     def detect_layout(
         self,
         image: Union[np.ndarray, "Image.Image", "torch.Tensor"],
     ) -> tuple[str, str, str] | None:
-        """Detect bowl positions via HSV color segmentation — no VLM inference needed.
+        """Detect bowl positions via HSV color segmentation.
 
         Call once at episode start (before the first normalize() call) to cache
         the layout.  All subsequent spatial prompts are then resolved instantly.
@@ -1097,63 +1218,6 @@ class PromptNormalizer:
         self._robot_order = robot_order
         return robot_order
 
-    # ── Factory methods ────────────────────────────────────────────────────────
-
-    @classmethod
-    def from_policy(
-        cls,
-        policy,
-        device: str | "torch.device" | None = None,
-        **kwargs,
-    ) -> "PromptNormalizer":
-        """Construct from an already-loaded SmolVLAPolicy — zero extra weights.
-
-        The SmolVLA policy contains a full ``SmolVLMForConditionalGeneration``
-        (``policy.model.vlm_with_expert.vlm``) that supports ``.generate()``.
-        We reuse it here for one-shot color identification before the action loop.
-
-        Usage::
-
-            normalizer = PromptNormalizer.from_policy(policy, device="cuda")
-            # Get first camera frame before the action loop
-            task = normalizer.normalize(camera_frame, raw_prompt)
-            # Then run SmolVLA with the canonical task string
-        """
-        vwe = policy.model.vlm_with_expert
-        dev = device
-        if dev is None:
-            try:
-                dev = next(vwe.vlm.parameters()).device
-            except StopIteration:
-                dev = "cpu"
-        return cls(vlm=vwe.vlm, processor=vwe.processor, device=dev, **kwargs)
-
-    @classmethod
-    def from_pretrained(
-        cls,
-        model_id: str = "HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
-        device: str | "torch.device" = "cuda",
-        **kwargs,
-    ) -> "PromptNormalizer":
-        """Load a standalone SmolVLM (no SmolVLA policy required).
-
-        Useful for testing the normalizer independently or when you want a
-        full-capacity VLM instead of the potentially layer-truncated SmolVLA backbone.
-        The default model matches the VLM backbone used inside SmolVLA base.
-        """
-        if torch is None:
-            raise ImportError("torch is required to load the optional SmolVLM fallback")
-        from transformers import AutoModelForImageTextToText, AutoProcessor
-
-        processor = AutoProcessor.from_pretrained(model_id)
-        vlm = AutoModelForImageTextToText.from_pretrained(
-            model_id,
-            torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=True,
-        ).to(device)
-        vlm.eval()
-        return cls(vlm=vlm, processor=processor, device=device, **kwargs)
-
     # ── Core method ────────────────────────────────────────────────────────────
 
     def normalize(
@@ -1164,8 +1228,10 @@ class PromptNormalizer:
         """Convert a complex task prompt to the canonical color-based form.
 
         Routing:
-          1. Negation  ("not red and not blue")            → deterministic, no VLM
-          2. Analogy   ("color of grass", "stop sign")     → deterministic, no VLM
+          1. Direct    ("red bowl", "target is blue")      → deterministic
+          2. Negation  ("not red and not blue")            → deterministic
+          3. Analogy   ("color of grass", "stop sign")     → deterministic
+          4. Spatial   ("2nd from left", "right of red")   → HSV layout + rules
           3. Spatial   ("2nd from left", "right of red")   → HSV layout + rules
 
         Parameters
@@ -1180,8 +1246,8 @@ class PromptNormalizer:
         -------
         str
             ``"Put the banana in the red colored bowl."`` (or green / blue).
-            Falls back to ``raw_prompt`` if VLM output cannot be parsed and
-            ``fallback_passthrough=True``.
+            Falls back to a deterministic best-effort color when a strict
+            match is unavailable.
         """
         # ── Stages 0-2: direct color, negation, and analogy ──────────────────
         try:
@@ -1212,7 +1278,6 @@ class PromptNormalizer:
                 logging.info("[PromptNormalizer] neg+spatial %r → %r", raw_prompt, canonical)
                 return canonical
 
-        # ── Stage 4: VLM fallback (novel/ambiguous spatial prompts) ───────────
         if self._vlm is None or self._processor is None:
             robot_order = self._robot_order or self._fallback_robot_order
             canonical, reason = normalize_prompt_best_effort(raw_prompt, robot_order=robot_order)
@@ -1223,6 +1288,7 @@ class PromptNormalizer:
                 canonical,
             )
             return canonical
+
         logging.info("[PromptNormalizer] VLM fallback for %r", raw_prompt)
         return self._vlm_normalize(image, raw_prompt)
 
@@ -1231,67 +1297,40 @@ class PromptNormalizer:
         image: Union[np.ndarray, "Image.Image", "torch.Tensor"],
         raw_prompt: str,
     ) -> str:
-        """Inner method: call the VLM for spatial prompts that need image reasoning."""
+        """Legacy/offline image-language fallback. Deployment does not call this."""
         if torch is None:
-            raise ImportError("torch is required to run the optional SmolVLM fallback")
+            raise ImportError("PyTorch is required for VLM prompt normalization")
         pil_image = _to_pil(image)
-
-        user_text = (
-            f"{_SPATIAL_PROMPT}\n\n"
-            f"Instruction: {raw_prompt}"
-        )
         messages = [
             {
                 "role": "user",
                 "content": [
                     {"type": "image"},
-                    {"type": "text", "text": user_text},
+                    {"type": "text", "text": _SPATIAL_PROMPT.format(raw_prompt=raw_prompt)},
                 ],
             }
         ]
-
-        text = self._processor.apply_chat_template(
-            messages, add_generation_prompt=True
+        prompt = self._processor.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
         )
-        inputs = self._processor(
-            text=[text],
-            images=[pil_image],
-            return_tensors="pt",
-        ).to(self._device)
-
-        input_len = inputs["input_ids"].shape[-1]
-
+        inputs = self._processor(text=prompt, images=[pil_image], return_tensors="pt")
+        if hasattr(inputs, "to"):
+            inputs = inputs.to(self._device)
         with torch.inference_mode():
-            gen_ids = self._vlm.generate(
+            generated_ids = self._vlm.generate(
                 **inputs,
                 max_new_tokens=self._max_new_tokens,
-                do_sample=False,
-                repetition_penalty=1.3,   # prevents hallucination loops
             )
 
-        new_tokens = gen_ids[:, input_len:]
-        raw_output = self._processor.batch_decode(
-            new_tokens, skip_special_tokens=True
-        )[0].strip().lower()
-
-        logging.info("[PromptNormalizer] vlm_raw=%r  prompt=%r", raw_output, raw_prompt)
-
-        color = _extract_color_from_reasoning(raw_output)
+        input_len = inputs["input_ids"].shape[-1]
+        generated_ids = generated_ids[:, input_len:]
+        text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        color = _extract_color_from_reasoning(text)
         if color is None:
-            msg = (
-                f"[PromptNormalizer] Cannot parse color from VLM output {raw_output!r} "
-                f"(prompt={raw_prompt!r})"
-            )
-            if self._fallback_passthrough:
-                robot_order = self._robot_order or self._fallback_robot_order
-                canonical, reason = normalize_prompt_best_effort(raw_prompt, robot_order=robot_order)
-                logging.warning("%s — best-effort fallback (%s) → %r", msg, reason, canonical)
-                return canonical
-            raise ValueError(msg)
-
-        canonical = canonical_prompt(color)
-        logging.info("[PromptNormalizer] spatial  %r → %r", raw_prompt, canonical)
-        return canonical
+            raise ValueError(f"VLM fallback did not return a bowl color: {text!r}")
+        return canonical_prompt(color)
 
     def __call__(
         self,
@@ -1299,30 +1338,6 @@ class PromptNormalizer:
         raw_prompt: str,
     ) -> str:
         return self.normalize(image, raw_prompt)
-
-
-# ── Helpers ────────────────────────────────────────────────────────────────────
-
-def _extract_color_from_reasoning(text: str) -> str | None:
-    """Parse the target color out of a chain-of-thought VLM response.
-
-    Priority order:
-      1. Explicit ``ANSWER: <color>`` tag (most reliable).
-      2. Last color word in the text — for chain-of-thought, the conclusion
-         comes last, so "not red, not blue … green" → "green".
-      3. Returns None if no color found at all.
-    """
-    # 1. Look for explicit ANSWER: tag
-    m = re.search(r"\banswer\s*:\s*(red|green|blue)\b", text, re.IGNORECASE)
-    if m:
-        return m.group(1).lower()
-
-    # 2. Last color word in the full output
-    all_matches = re.findall(r"\b(red|green|blue)\b", text, re.IGNORECASE)
-    if all_matches:
-        return all_matches[-1].lower()
-
-    return None
 
 
 # ── Smoke test ─────────────────────────────────────────────────────────────────
@@ -1348,18 +1363,25 @@ Examples:
     ap.add_argument("prompt", help="Complex task prompt to normalize.")
     ap.add_argument(
         "--model-id",
-        default="HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
-        help="SmolVLM Hub model ID for standalone mode.",
+        default=None,
+        help="Optional standalone SmolVLM model id for legacy/offline fallback.",
     )
+    ap.add_argument("--device", default="cuda", help="Device for optional standalone SmolVLM fallback.")
     ap.add_argument(
-        "--device",
-        default="cuda" if torch is not None and torch.cuda.is_available() else "cpu",
+        "--fallback-robot-order",
+        default=",".join(DEFAULT_ROBOT_ORDER),
+        help="Robot-perspective fallback bowl order, e.g. blue,red,green.",
     )
     args = ap.parse_args()
 
     if Image is None:
         raise ImportError("Pillow is required to load the test image")
-    normalizer = PromptNormalizer.from_pretrained(args.model_id, device=args.device)
+    fallback_order = tuple(part.strip().lower() for part in args.fallback_robot_order.split(","))
+    normalizer_kwargs = {"fallback_robot_order": validate_robot_order(fallback_order)}
+    if args.model_id:
+        normalizer = PromptNormalizer.from_pretrained(args.model_id, device=args.device, **normalizer_kwargs)
+    else:
+        normalizer = PromptNormalizer(**normalizer_kwargs)
     img = Image.open(args.image)
     result = normalizer.normalize(img, args.prompt)
     print(result)

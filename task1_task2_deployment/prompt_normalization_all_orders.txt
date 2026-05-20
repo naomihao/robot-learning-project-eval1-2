@@ -1,0 +1,798 @@
+
+[task2] robot_order=('blue', 'red', 'green')
+S red   | put the banana in the middle of the three bowls
+S red   | put the banana into the center bowl
+S red   | put the banana into the centre bowl
+S red   | put the banana in the central bowl
+S red   | put banana in the bowl in the middle
+S red   | put banana in the middle one
+S red   | place the banana in the center one
+S red   | drop the banana into the bowl that is in between the other two
+S red   | put banana in the second bowl
+S red   | put banana in the second bowl from the left
+S red   | put banana in the 2nd bowl from left
+S red   | put banana in the 2nd from the robot's left
+S red   | put banana in the number two bowl from the left
+S red   | put banana in bowl number 2 from robot left
+S red   | put banana in the second from the robot perspective
+S green | put banana in the first bowl from the right
+S blue  | put banana in the third bowl from the robot's right
+S blue  | put banana in the first bowl from the left
+S green | put banana in the third bowl from the left
+S green | put banana in the 1st bowl from the robot's right
+S green | put banana in the 3rd bowl from the robot's left
+S green | put banana in the rightmost bowl
+S blue  | put banana in the leftmost bowl
+S blue  | put banana in the far left bowl
+S green | put banana in the far right bowl
+S green | put banana in the right-hand bowl
+S blue  | put banana in the left-hand bowl
+S blue  | put banana in the bowl on the left side
+S green | put banana in the bowl on the right side
+S blue  | put banana in the left side bowl
+S green | put banana in the right side bowl
+S blue  | put banana in the outer left bowl
+S green | put banana in the outer right bowl
+S red   | put banana in the bowl to the right of the leftmost bowl
+S red   | put banana in the bowl to the left of the rightmost bowl
+S blue  | put banana in the bowl left of the middle bowl
+S green | put banana in the bowl right of the middle bowl
+S blue  | put banana in the bowl immediately to the left of the middle bowl
+S green | put banana in the bowl immediately to the right of the middle bowl
+S red   | put banana in the bowl beside the rightmost bowl
+S red   | put banana in the bowl beside the leftmost bowl
+S green | put banana in the bowl on the right of the red bowl
+S blue  | put banana in the bowl on the left of the red bowl
+B green | put banana in the bowl on the right of the green bowl
+S red   | put banana in the bowl on the left of the green bowl
+S red   | put banana in the bowl on the right of the blue bowl
+B blue  | put banana in the bowl on the left of the blue bowl
+S green | put banana to the right of the red
+S blue  | put banana to the left of the red
+B blue  | put banana to the left of the blue
+S red   | put banana to the right of the blue
+S red   | put banana to the left of the green
+B green | put banana to the right of the green
+S red   | put banana to the left of the avocado colored bowl
+S red   | put banana to the right of the sky colored bowl
+S red   | put banana to the left of the grass colored bowl
+S green | put banana to the right of the tomato colored bowl
+S red   | put banana just to the left of the avocado bowl
+S red   | put banana immediately to the right of the sky bowl
+S red   | put banana directly to the left of the green colored bowl
+S red   | put banana directly to the right of the blue colored bowl
+S green | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+S green | put banana in the bowl directly right of the red bowl
+S green | put banana in the bowl on the right side of the red bowl
+S blue  | put banana in the bowl just left of the red bowl
+S green | put banana in the bowl just to the right of the red bowl
+S blue  | put banana in the bowl immediately to the left of the red bowl
+S green | put banana in the red bowl's right
+S blue  | put banana in the red bowl's left
+S green | put banana in the red bowl's right neighbor
+S blue  | put banana in the red bowl's left neighbor
+S green | put banana in the right neighbor of the red bowl
+S blue  | put banana in the left neighbor of the red bowl
+S red   | put banana in the neighbor to the left of the green bowl
+S red   | put banana in the neighbor to the right of the blue bowl
+S green | put banana in the bowl next to the red bowl on the right
+S blue  | put banana in the bowl adjacent to the red bowl on the left
+S green | put banana in the bowl beside the red bowl on the right
+S red   | put banana in the bowl beside the green bowl on the left
+S red   | put banana in the bowl near the blue bowl on the right
+S red   | put banana in the bowl next to the leftmost bowl
+S red   | put banana in the bowl adjacent to the rightmost bowl
+S green | put banana in the bowl next to the middle bowl on the right
+S blue  | put banana in the bowl next to the middle bowl on the left
+S red   | put banana in the bowl between blue and green
+S red   | put banana in between the blue bowl and the green bowl
+S red   | put banana in the one between the blue and green bowls
+S red   | put banana in the gap between the blue bowl and the green bowl
+S red   | put banana in the bowl located between the blue bowl and the green bowl
+B red   | put banana in the bowl sitting between red and blue
+S red   | put banana in the bowl separating blue and green
+S red   | put banana in the bowl that separates blue from green
+S red   | put banana in the separator bowl between blue and green
+S red   | put banana in the bowl adjacent to both blue and green
+S red   | put banana in the one touching both the blue and green bowls
+S red   | put banana in the bowl that is not at either end
+S red   | put banana in the bowl that is neither leftmost nor rightmost
+B blue  | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+S red   | put banana in the bowl that is not the rightmost and not blue
+B red   | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+B red   | put banana in the bowl that is not sea or leftmost
+S red   | put banana in the bowl that is not ocean colored and not rightmost
+S blue  | put banana in the bowl that is not blood or rightmost
+S blue  | put banana in the bowl that is neither red nor rightmost
+S red   | put banana in the bowl that is not avocado colored and not leftmost
+S green | put banana in the bowl that is neither sky colored nor middle
+B red   | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+S blue  | put banana in the bowl on the left of the red bowl
+B red   | put banana somewhere safe
+B blue  | put banana in the bowl that is not red
+[summary] strict=119  best_effort=11  total=130
+
+[task2] robot_order=('red', 'green', 'blue')
+S green | put the banana in the middle of the three bowls
+S green | put the banana into the center bowl
+S green | put the banana into the centre bowl
+S green | put the banana in the central bowl
+S green | put banana in the bowl in the middle
+S green | put banana in the middle one
+S green | place the banana in the center one
+S green | drop the banana into the bowl that is in between the other two
+S green | put banana in the second bowl
+S green | put banana in the second bowl from the left
+S green | put banana in the 2nd bowl from left
+S green | put banana in the 2nd from the robot's left
+S green | put banana in the number two bowl from the left
+S green | put banana in bowl number 2 from robot left
+S green | put banana in the second from the robot perspective
+S blue  | put banana in the first bowl from the right
+S red   | put banana in the third bowl from the robot's right
+S red   | put banana in the first bowl from the left
+S blue  | put banana in the third bowl from the left
+S blue  | put banana in the 1st bowl from the robot's right
+S blue  | put banana in the 3rd bowl from the robot's left
+S blue  | put banana in the rightmost bowl
+S red   | put banana in the leftmost bowl
+S red   | put banana in the far left bowl
+S blue  | put banana in the far right bowl
+S blue  | put banana in the right-hand bowl
+S red   | put banana in the left-hand bowl
+S red   | put banana in the bowl on the left side
+S blue  | put banana in the bowl on the right side
+S red   | put banana in the left side bowl
+S blue  | put banana in the right side bowl
+S red   | put banana in the outer left bowl
+S blue  | put banana in the outer right bowl
+S green | put banana in the bowl to the right of the leftmost bowl
+S green | put banana in the bowl to the left of the rightmost bowl
+S red   | put banana in the bowl left of the middle bowl
+S blue  | put banana in the bowl right of the middle bowl
+S red   | put banana in the bowl immediately to the left of the middle bowl
+S blue  | put banana in the bowl immediately to the right of the middle bowl
+S green | put banana in the bowl beside the rightmost bowl
+S green | put banana in the bowl beside the leftmost bowl
+S green | put banana in the bowl on the right of the red bowl
+B red   | put banana in the bowl on the left of the red bowl
+S blue  | put banana in the bowl on the right of the green bowl
+S red   | put banana in the bowl on the left of the green bowl
+B blue  | put banana in the bowl on the right of the blue bowl
+S green | put banana in the bowl on the left of the blue bowl
+S green | put banana to the right of the red
+B red   | put banana to the left of the red
+S green | put banana to the left of the blue
+B blue  | put banana to the right of the blue
+S red   | put banana to the left of the green
+S blue  | put banana to the right of the green
+S red   | put banana to the left of the avocado colored bowl
+B blue  | put banana to the right of the sky colored bowl
+S red   | put banana to the left of the grass colored bowl
+S green | put banana to the right of the tomato colored bowl
+S red   | put banana just to the left of the avocado bowl
+B blue  | put banana immediately to the right of the sky bowl
+S red   | put banana directly to the left of the green colored bowl
+B blue  | put banana directly to the right of the blue colored bowl
+S green | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+S green | put banana in the bowl directly right of the red bowl
+S green | put banana in the bowl on the right side of the red bowl
+B red   | put banana in the bowl just left of the red bowl
+S green | put banana in the bowl just to the right of the red bowl
+B red   | put banana in the bowl immediately to the left of the red bowl
+S green | put banana in the red bowl's right
+B red   | put banana in the red bowl's left
+S green | put banana in the red bowl's right neighbor
+B red   | put banana in the red bowl's left neighbor
+S green | put banana in the right neighbor of the red bowl
+B red   | put banana in the left neighbor of the red bowl
+S red   | put banana in the neighbor to the left of the green bowl
+B blue  | put banana in the neighbor to the right of the blue bowl
+S green | put banana in the bowl next to the red bowl on the right
+B red   | put banana in the bowl adjacent to the red bowl on the left
+S green | put banana in the bowl beside the red bowl on the right
+S red   | put banana in the bowl beside the green bowl on the left
+B blue  | put banana in the bowl near the blue bowl on the right
+S green | put banana in the bowl next to the leftmost bowl
+S green | put banana in the bowl adjacent to the rightmost bowl
+S blue  | put banana in the bowl next to the middle bowl on the right
+S red   | put banana in the bowl next to the middle bowl on the left
+B green | put banana in the bowl between blue and green
+B green | put banana in between the blue bowl and the green bowl
+B green | put banana in the one between the blue and green bowls
+B green | put banana in the gap between the blue bowl and the green bowl
+B green | put banana in the bowl located between the blue bowl and the green bowl
+S green | put banana in the bowl sitting between red and blue
+B green | put banana in the bowl separating blue and green
+B green | put banana in the bowl that separates blue from green
+B green | put banana in the separator bowl between blue and green
+B green | put banana in the bowl adjacent to both blue and green
+B green | put banana in the one touching both the blue and green bowls
+S green | put banana in the bowl that is not at either end
+S green | put banana in the bowl that is neither leftmost nor rightmost
+B red   | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+B green | put banana in the bowl that is not the rightmost and not blue
+S green | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+S green | put banana in the bowl that is not sea or leftmost
+B green | put banana in the bowl that is not ocean colored and not rightmost
+S green | put banana in the bowl that is not blood or rightmost
+S green | put banana in the bowl that is neither red nor rightmost
+S blue  | put banana in the bowl that is not avocado colored and not leftmost
+S red   | put banana in the bowl that is neither sky colored nor middle
+S red   | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+B red   | put banana in the bowl on the left of the red bowl
+B green | put banana somewhere safe
+B green | put banana in the bowl that is not red
+[summary] strict=99  best_effort=31  total=130
+
+[task2] robot_order=('red', 'blue', 'green')
+S blue  | put the banana in the middle of the three bowls
+S blue  | put the banana into the center bowl
+S blue  | put the banana into the centre bowl
+S blue  | put the banana in the central bowl
+S blue  | put banana in the bowl in the middle
+S blue  | put banana in the middle one
+S blue  | place the banana in the center one
+S blue  | drop the banana into the bowl that is in between the other two
+S blue  | put banana in the second bowl
+S blue  | put banana in the second bowl from the left
+S blue  | put banana in the 2nd bowl from left
+S blue  | put banana in the 2nd from the robot's left
+S blue  | put banana in the number two bowl from the left
+S blue  | put banana in bowl number 2 from robot left
+S blue  | put banana in the second from the robot perspective
+S green | put banana in the first bowl from the right
+S red   | put banana in the third bowl from the robot's right
+S red   | put banana in the first bowl from the left
+S green | put banana in the third bowl from the left
+S green | put banana in the 1st bowl from the robot's right
+S green | put banana in the 3rd bowl from the robot's left
+S green | put banana in the rightmost bowl
+S red   | put banana in the leftmost bowl
+S red   | put banana in the far left bowl
+S green | put banana in the far right bowl
+S green | put banana in the right-hand bowl
+S red   | put banana in the left-hand bowl
+S red   | put banana in the bowl on the left side
+S green | put banana in the bowl on the right side
+S red   | put banana in the left side bowl
+S green | put banana in the right side bowl
+S red   | put banana in the outer left bowl
+S green | put banana in the outer right bowl
+S blue  | put banana in the bowl to the right of the leftmost bowl
+S blue  | put banana in the bowl to the left of the rightmost bowl
+S red   | put banana in the bowl left of the middle bowl
+S green | put banana in the bowl right of the middle bowl
+S red   | put banana in the bowl immediately to the left of the middle bowl
+S green | put banana in the bowl immediately to the right of the middle bowl
+S blue  | put banana in the bowl beside the rightmost bowl
+S blue  | put banana in the bowl beside the leftmost bowl
+S blue  | put banana in the bowl on the right of the red bowl
+B red   | put banana in the bowl on the left of the red bowl
+B green | put banana in the bowl on the right of the green bowl
+S blue  | put banana in the bowl on the left of the green bowl
+S green | put banana in the bowl on the right of the blue bowl
+S red   | put banana in the bowl on the left of the blue bowl
+S blue  | put banana to the right of the red
+B red   | put banana to the left of the red
+S red   | put banana to the left of the blue
+S green | put banana to the right of the blue
+S blue  | put banana to the left of the green
+B green | put banana to the right of the green
+S blue  | put banana to the left of the avocado colored bowl
+S green | put banana to the right of the sky colored bowl
+S blue  | put banana to the left of the grass colored bowl
+S blue  | put banana to the right of the tomato colored bowl
+S blue  | put banana just to the left of the avocado bowl
+S green | put banana immediately to the right of the sky bowl
+S blue  | put banana directly to the left of the green colored bowl
+S green | put banana directly to the right of the blue colored bowl
+S blue  | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+S blue  | put banana in the bowl directly right of the red bowl
+S blue  | put banana in the bowl on the right side of the red bowl
+B red   | put banana in the bowl just left of the red bowl
+S blue  | put banana in the bowl just to the right of the red bowl
+B red   | put banana in the bowl immediately to the left of the red bowl
+S blue  | put banana in the red bowl's right
+B red   | put banana in the red bowl's left
+S blue  | put banana in the red bowl's right neighbor
+B red   | put banana in the red bowl's left neighbor
+S blue  | put banana in the right neighbor of the red bowl
+B red   | put banana in the left neighbor of the red bowl
+S blue  | put banana in the neighbor to the left of the green bowl
+S green | put banana in the neighbor to the right of the blue bowl
+S blue  | put banana in the bowl next to the red bowl on the right
+B red   | put banana in the bowl adjacent to the red bowl on the left
+S blue  | put banana in the bowl beside the red bowl on the right
+S blue  | put banana in the bowl beside the green bowl on the left
+S green | put banana in the bowl near the blue bowl on the right
+S blue  | put banana in the bowl next to the leftmost bowl
+S blue  | put banana in the bowl adjacent to the rightmost bowl
+S green | put banana in the bowl next to the middle bowl on the right
+S red   | put banana in the bowl next to the middle bowl on the left
+B blue  | put banana in the bowl between blue and green
+B blue  | put banana in between the blue bowl and the green bowl
+B blue  | put banana in the one between the blue and green bowls
+B blue  | put banana in the gap between the blue bowl and the green bowl
+B blue  | put banana in the bowl located between the blue bowl and the green bowl
+B blue  | put banana in the bowl sitting between red and blue
+B blue  | put banana in the bowl separating blue and green
+B blue  | put banana in the bowl that separates blue from green
+B blue  | put banana in the separator bowl between blue and green
+B blue  | put banana in the bowl adjacent to both blue and green
+B green | put banana in the one touching both the blue and green bowls
+S blue  | put banana in the bowl that is not at either end
+S blue  | put banana in the bowl that is neither leftmost nor rightmost
+B red   | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+S red   | put banana in the bowl that is not the rightmost and not blue
+S green | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+S green | put banana in the bowl that is not sea or leftmost
+S red   | put banana in the bowl that is not ocean colored and not rightmost
+S blue  | put banana in the bowl that is not blood or rightmost
+S blue  | put banana in the bowl that is neither red nor rightmost
+S blue  | put banana in the bowl that is not avocado colored and not leftmost
+B red   | put banana in the bowl that is neither sky colored nor middle
+B blue  | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+B red   | put banana in the bowl on the left of the red bowl
+B blue  | put banana somewhere safe
+B blue  | put banana in the bowl that is not red
+[summary] strict=103  best_effort=27  total=130
+
+[task2] robot_order=('green', 'red', 'blue')
+S red   | put the banana in the middle of the three bowls
+S red   | put the banana into the center bowl
+S red   | put the banana into the centre bowl
+S red   | put the banana in the central bowl
+S red   | put banana in the bowl in the middle
+S red   | put banana in the middle one
+S red   | place the banana in the center one
+S red   | drop the banana into the bowl that is in between the other two
+S red   | put banana in the second bowl
+S red   | put banana in the second bowl from the left
+S red   | put banana in the 2nd bowl from left
+S red   | put banana in the 2nd from the robot's left
+S red   | put banana in the number two bowl from the left
+S red   | put banana in bowl number 2 from robot left
+S red   | put banana in the second from the robot perspective
+S blue  | put banana in the first bowl from the right
+S green | put banana in the third bowl from the robot's right
+S green | put banana in the first bowl from the left
+S blue  | put banana in the third bowl from the left
+S blue  | put banana in the 1st bowl from the robot's right
+S blue  | put banana in the 3rd bowl from the robot's left
+S blue  | put banana in the rightmost bowl
+S green | put banana in the leftmost bowl
+S green | put banana in the far left bowl
+S blue  | put banana in the far right bowl
+S blue  | put banana in the right-hand bowl
+S green | put banana in the left-hand bowl
+S green | put banana in the bowl on the left side
+S blue  | put banana in the bowl on the right side
+S green | put banana in the left side bowl
+S blue  | put banana in the right side bowl
+S green | put banana in the outer left bowl
+S blue  | put banana in the outer right bowl
+S red   | put banana in the bowl to the right of the leftmost bowl
+S red   | put banana in the bowl to the left of the rightmost bowl
+S green | put banana in the bowl left of the middle bowl
+S blue  | put banana in the bowl right of the middle bowl
+S green | put banana in the bowl immediately to the left of the middle bowl
+S blue  | put banana in the bowl immediately to the right of the middle bowl
+S red   | put banana in the bowl beside the rightmost bowl
+S red   | put banana in the bowl beside the leftmost bowl
+S blue  | put banana in the bowl on the right of the red bowl
+S green | put banana in the bowl on the left of the red bowl
+S red   | put banana in the bowl on the right of the green bowl
+B green | put banana in the bowl on the left of the green bowl
+B blue  | put banana in the bowl on the right of the blue bowl
+S red   | put banana in the bowl on the left of the blue bowl
+S blue  | put banana to the right of the red
+S green | put banana to the left of the red
+S red   | put banana to the left of the blue
+B blue  | put banana to the right of the blue
+B green | put banana to the left of the green
+S red   | put banana to the right of the green
+B green | put banana to the left of the avocado colored bowl
+B blue  | put banana to the right of the sky colored bowl
+B green | put banana to the left of the grass colored bowl
+S blue  | put banana to the right of the tomato colored bowl
+B green | put banana just to the left of the avocado bowl
+B blue  | put banana immediately to the right of the sky bowl
+B green | put banana directly to the left of the green colored bowl
+B blue  | put banana directly to the right of the blue colored bowl
+S blue  | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+S blue  | put banana in the bowl directly right of the red bowl
+S blue  | put banana in the bowl on the right side of the red bowl
+S green | put banana in the bowl just left of the red bowl
+S blue  | put banana in the bowl just to the right of the red bowl
+S green | put banana in the bowl immediately to the left of the red bowl
+S blue  | put banana in the red bowl's right
+S green | put banana in the red bowl's left
+S blue  | put banana in the red bowl's right neighbor
+S green | put banana in the red bowl's left neighbor
+S blue  | put banana in the right neighbor of the red bowl
+S green | put banana in the left neighbor of the red bowl
+B green | put banana in the neighbor to the left of the green bowl
+B blue  | put banana in the neighbor to the right of the blue bowl
+S blue  | put banana in the bowl next to the red bowl on the right
+S green | put banana in the bowl adjacent to the red bowl on the left
+S blue  | put banana in the bowl beside the red bowl on the right
+B green | put banana in the bowl beside the green bowl on the left
+B blue  | put banana in the bowl near the blue bowl on the right
+S red   | put banana in the bowl next to the leftmost bowl
+S red   | put banana in the bowl adjacent to the rightmost bowl
+S blue  | put banana in the bowl next to the middle bowl on the right
+S green | put banana in the bowl next to the middle bowl on the left
+S red   | put banana in the bowl between blue and green
+S red   | put banana in between the blue bowl and the green bowl
+S red   | put banana in the one between the blue and green bowls
+S red   | put banana in the gap between the blue bowl and the green bowl
+S red   | put banana in the bowl located between the blue bowl and the green bowl
+B red   | put banana in the bowl sitting between red and blue
+S red   | put banana in the bowl separating blue and green
+S red   | put banana in the bowl that separates blue from green
+S red   | put banana in the separator bowl between blue and green
+S red   | put banana in the bowl adjacent to both blue and green
+S red   | put banana in the one touching both the blue and green bowls
+S red   | put banana in the bowl that is not at either end
+S red   | put banana in the bowl that is neither leftmost nor rightmost
+B green | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+B red   | put banana in the bowl that is not the rightmost and not blue
+S red   | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+S red   | put banana in the bowl that is not sea or leftmost
+B red   | put banana in the bowl that is not ocean colored and not rightmost
+S green | put banana in the bowl that is not blood or rightmost
+S green | put banana in the bowl that is neither red nor rightmost
+B red   | put banana in the bowl that is not avocado colored and not leftmost
+S green | put banana in the bowl that is neither sky colored nor middle
+S red   | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+S green | put banana in the bowl on the left of the red bowl
+B red   | put banana somewhere safe
+B green | put banana in the bowl that is not red
+[summary] strict=108  best_effort=22  total=130
+
+[task2] robot_order=('green', 'blue', 'red')
+S blue  | put the banana in the middle of the three bowls
+S blue  | put the banana into the center bowl
+S blue  | put the banana into the centre bowl
+S blue  | put the banana in the central bowl
+S blue  | put banana in the bowl in the middle
+S blue  | put banana in the middle one
+S blue  | place the banana in the center one
+S blue  | drop the banana into the bowl that is in between the other two
+S blue  | put banana in the second bowl
+S blue  | put banana in the second bowl from the left
+S blue  | put banana in the 2nd bowl from left
+S blue  | put banana in the 2nd from the robot's left
+S blue  | put banana in the number two bowl from the left
+S blue  | put banana in bowl number 2 from robot left
+S blue  | put banana in the second from the robot perspective
+S red   | put banana in the first bowl from the right
+S green | put banana in the third bowl from the robot's right
+S green | put banana in the first bowl from the left
+S red   | put banana in the third bowl from the left
+S red   | put banana in the 1st bowl from the robot's right
+S red   | put banana in the 3rd bowl from the robot's left
+S red   | put banana in the rightmost bowl
+S green | put banana in the leftmost bowl
+S green | put banana in the far left bowl
+S red   | put banana in the far right bowl
+S red   | put banana in the right-hand bowl
+S green | put banana in the left-hand bowl
+S green | put banana in the bowl on the left side
+S red   | put banana in the bowl on the right side
+S green | put banana in the left side bowl
+S red   | put banana in the right side bowl
+S green | put banana in the outer left bowl
+S red   | put banana in the outer right bowl
+S blue  | put banana in the bowl to the right of the leftmost bowl
+S blue  | put banana in the bowl to the left of the rightmost bowl
+S green | put banana in the bowl left of the middle bowl
+S red   | put banana in the bowl right of the middle bowl
+S green | put banana in the bowl immediately to the left of the middle bowl
+S red   | put banana in the bowl immediately to the right of the middle bowl
+S blue  | put banana in the bowl beside the rightmost bowl
+S blue  | put banana in the bowl beside the leftmost bowl
+B red   | put banana in the bowl on the right of the red bowl
+S blue  | put banana in the bowl on the left of the red bowl
+S blue  | put banana in the bowl on the right of the green bowl
+B green | put banana in the bowl on the left of the green bowl
+S red   | put banana in the bowl on the right of the blue bowl
+S green | put banana in the bowl on the left of the blue bowl
+B red   | put banana to the right of the red
+S blue  | put banana to the left of the red
+S green | put banana to the left of the blue
+S red   | put banana to the right of the blue
+B green | put banana to the left of the green
+S blue  | put banana to the right of the green
+B green | put banana to the left of the avocado colored bowl
+S red   | put banana to the right of the sky colored bowl
+B green | put banana to the left of the grass colored bowl
+B red   | put banana to the right of the tomato colored bowl
+B green | put banana just to the left of the avocado bowl
+S red   | put banana immediately to the right of the sky bowl
+B green | put banana directly to the left of the green colored bowl
+S red   | put banana directly to the right of the blue colored bowl
+B red   | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+B red   | put banana in the bowl directly right of the red bowl
+B red   | put banana in the bowl on the right side of the red bowl
+S blue  | put banana in the bowl just left of the red bowl
+B red   | put banana in the bowl just to the right of the red bowl
+S blue  | put banana in the bowl immediately to the left of the red bowl
+B red   | put banana in the red bowl's right
+S blue  | put banana in the red bowl's left
+B red   | put banana in the red bowl's right neighbor
+S blue  | put banana in the red bowl's left neighbor
+B red   | put banana in the right neighbor of the red bowl
+S blue  | put banana in the left neighbor of the red bowl
+B green | put banana in the neighbor to the left of the green bowl
+S red   | put banana in the neighbor to the right of the blue bowl
+B red   | put banana in the bowl next to the red bowl on the right
+S blue  | put banana in the bowl adjacent to the red bowl on the left
+B red   | put banana in the bowl beside the red bowl on the right
+B green | put banana in the bowl beside the green bowl on the left
+S red   | put banana in the bowl near the blue bowl on the right
+S blue  | put banana in the bowl next to the leftmost bowl
+S blue  | put banana in the bowl adjacent to the rightmost bowl
+S red   | put banana in the bowl next to the middle bowl on the right
+S green | put banana in the bowl next to the middle bowl on the left
+B blue  | put banana in the bowl between blue and green
+B blue  | put banana in between the blue bowl and the green bowl
+B blue  | put banana in the one between the blue and green bowls
+B blue  | put banana in the gap between the blue bowl and the green bowl
+B blue  | put banana in the bowl located between the blue bowl and the green bowl
+B blue  | put banana in the bowl sitting between red and blue
+B blue  | put banana in the bowl separating blue and green
+B blue  | put banana in the bowl that separates blue from green
+B blue  | put banana in the separator bowl between blue and green
+B blue  | put banana in the bowl adjacent to both blue and green
+B green | put banana in the one touching both the blue and green bowls
+S blue  | put banana in the bowl that is not at either end
+S blue  | put banana in the bowl that is neither leftmost nor rightmost
+B green | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+S green | put banana in the bowl that is not the rightmost and not blue
+S red   | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+S red   | put banana in the bowl that is not sea or leftmost
+S green | put banana in the bowl that is not ocean colored and not rightmost
+B blue  | put banana in the bowl that is not blood or rightmost
+B blue  | put banana in the bowl that is neither red nor rightmost
+B blue  | put banana in the bowl that is not avocado colored and not leftmost
+B green | put banana in the bowl that is neither sky colored nor middle
+S blue  | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+S blue  | put banana in the bowl on the left of the red bowl
+B blue  | put banana somewhere safe
+B blue  | put banana in the bowl that is not red
+[summary] strict=92  best_effort=38  total=130
+
+[task2] robot_order=('blue', 'green', 'red')
+S green | put the banana in the middle of the three bowls
+S green | put the banana into the center bowl
+S green | put the banana into the centre bowl
+S green | put the banana in the central bowl
+S green | put banana in the bowl in the middle
+S green | put banana in the middle one
+S green | place the banana in the center one
+S green | drop the banana into the bowl that is in between the other two
+S green | put banana in the second bowl
+S green | put banana in the second bowl from the left
+S green | put banana in the 2nd bowl from left
+S green | put banana in the 2nd from the robot's left
+S green | put banana in the number two bowl from the left
+S green | put banana in bowl number 2 from robot left
+S green | put banana in the second from the robot perspective
+S red   | put banana in the first bowl from the right
+S blue  | put banana in the third bowl from the robot's right
+S blue  | put banana in the first bowl from the left
+S red   | put banana in the third bowl from the left
+S red   | put banana in the 1st bowl from the robot's right
+S red   | put banana in the 3rd bowl from the robot's left
+S red   | put banana in the rightmost bowl
+S blue  | put banana in the leftmost bowl
+S blue  | put banana in the far left bowl
+S red   | put banana in the far right bowl
+S red   | put banana in the right-hand bowl
+S blue  | put banana in the left-hand bowl
+S blue  | put banana in the bowl on the left side
+S red   | put banana in the bowl on the right side
+S blue  | put banana in the left side bowl
+S red   | put banana in the right side bowl
+S blue  | put banana in the outer left bowl
+S red   | put banana in the outer right bowl
+S green | put banana in the bowl to the right of the leftmost bowl
+S green | put banana in the bowl to the left of the rightmost bowl
+S blue  | put banana in the bowl left of the middle bowl
+S red   | put banana in the bowl right of the middle bowl
+S blue  | put banana in the bowl immediately to the left of the middle bowl
+S red   | put banana in the bowl immediately to the right of the middle bowl
+S green | put banana in the bowl beside the rightmost bowl
+S green | put banana in the bowl beside the leftmost bowl
+B red   | put banana in the bowl on the right of the red bowl
+S green | put banana in the bowl on the left of the red bowl
+S red   | put banana in the bowl on the right of the green bowl
+S blue  | put banana in the bowl on the left of the green bowl
+S green | put banana in the bowl on the right of the blue bowl
+B blue  | put banana in the bowl on the left of the blue bowl
+B red   | put banana to the right of the red
+S green | put banana to the left of the red
+B blue  | put banana to the left of the blue
+S green | put banana to the right of the blue
+S blue  | put banana to the left of the green
+S red   | put banana to the right of the green
+S blue  | put banana to the left of the avocado colored bowl
+S green | put banana to the right of the sky colored bowl
+S blue  | put banana to the left of the grass colored bowl
+B red   | put banana to the right of the tomato colored bowl
+S blue  | put banana just to the left of the avocado bowl
+S green | put banana immediately to the right of the sky bowl
+S blue  | put banana directly to the left of the green colored bowl
+S green | put banana directly to the right of the blue colored bowl
+B red   | Put the banana into the bowl on the right of the red bowl. (from the robot perspective)
+B red   | put banana in the bowl directly right of the red bowl
+B red   | put banana in the bowl on the right side of the red bowl
+S green | put banana in the bowl just left of the red bowl
+B red   | put banana in the bowl just to the right of the red bowl
+S green | put banana in the bowl immediately to the left of the red bowl
+B red   | put banana in the red bowl's right
+S green | put banana in the red bowl's left
+B red   | put banana in the red bowl's right neighbor
+S green | put banana in the red bowl's left neighbor
+B red   | put banana in the right neighbor of the red bowl
+S green | put banana in the left neighbor of the red bowl
+S blue  | put banana in the neighbor to the left of the green bowl
+S green | put banana in the neighbor to the right of the blue bowl
+B red   | put banana in the bowl next to the red bowl on the right
+S green | put banana in the bowl adjacent to the red bowl on the left
+B red   | put banana in the bowl beside the red bowl on the right
+S blue  | put banana in the bowl beside the green bowl on the left
+S green | put banana in the bowl near the blue bowl on the right
+S green | put banana in the bowl next to the leftmost bowl
+S green | put banana in the bowl adjacent to the rightmost bowl
+S red   | put banana in the bowl next to the middle bowl on the right
+S blue  | put banana in the bowl next to the middle bowl on the left
+B green | put banana in the bowl between blue and green
+B green | put banana in between the blue bowl and the green bowl
+B green | put banana in the one between the blue and green bowls
+B green | put banana in the gap between the blue bowl and the green bowl
+B green | put banana in the bowl located between the blue bowl and the green bowl
+S green | put banana in the bowl sitting between red and blue
+B green | put banana in the bowl separating blue and green
+B green | put banana in the bowl that separates blue from green
+B green | put banana in the separator bowl between blue and green
+B green | put banana in the bowl adjacent to both blue and green
+B green | put banana in the one touching both the blue and green bowls
+S green | put banana in the bowl that is not at either end
+S green | put banana in the bowl that is neither leftmost nor rightmost
+B blue  | put banana in the bowl that is not the middle one
+S red   | put banana in the bowl that is not green and not blue
+S green | put banana in the bowl that is not red and not blue
+S blue  | put banana in the bowl that is not red and not green
+S green | put banana in the bowl that is neither red nor blue
+S red   | put banana in the bowl excluding green and blue
+S blue  | put banana in the bowl without red or green
+S green | put banana in the non-red non-blue bowl
+S green | put banana in the bowl that is not the rightmost and not blue
+B green | put banana in the bowl that is neither leftmost nor blue
+S blue  | put banana in the bowl that is not blood or grass
+S blue  | put banana in the bowl that is not blood and not grass
+S blue  | put banana in the bowl that is neither blood nor grass
+S blue  | put banana in the bowl that is not tomato colored or avocado colored
+B green | put banana in the bowl that is not sea or leftmost
+S green | put banana in the bowl that is not ocean colored and not rightmost
+B green | put banana in the bowl that is not blood or rightmost
+B green | put banana in the bowl that is neither red nor rightmost
+S red   | put banana in the bowl that is not avocado colored and not leftmost
+S red   | put banana in the bowl that is neither sky colored nor middle
+S blue  | put banana in the bowl that is not grass colored and not rightmost
+S green | put banana in the color of grass bowl
+S blue  | put banana in the bowl whose color is like the sky
+S green | put banana in the avocado colored bowl
+S red   | put banana in the tomato colored bowl
+S blue  | put banana in the ocean colored bowl
+S red   | put banana in the bowl the color of a stop sign
+S green | put banana in the bowl the color of a leaf
+S blue  | put banana in the bowl the color of blueberries
+S green | put banana in the traffic light go bowl
+S green | put banana in the bowl on the left of the red bowl
+B green | put banana somewhere safe
+B green | put banana in the bowl that is not red
+[summary] strict=99  best_effort=31  total=130
