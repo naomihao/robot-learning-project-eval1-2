@@ -796,26 +796,12 @@ def _load_prompt_tools():
     return PromptNormalizer, normalize_prompt_text, normalize_prompt_best_effort
 
 
-def _load_normalizer(
-    device: str,
-    *,
-    enable_vlm_fallback: bool = False,
-    fallback_robot_order: tuple[str, str, str],
-):
+def _load_normalizer(*, fallback_robot_order: tuple[str, str, str]):
     """Load the deterministic normalizer used for eval deployment."""
     PromptNormalizer, _, _ = _load_prompt_tools()
 
-    if enable_vlm_fallback:
-        raise ValueError(
-            "--enable-vlm-fallback is disabled for eval deployment; "
-            "prompt preprocessing uses deterministic rules only."
-        )
-
     print("[task2] Using deterministic prompt preprocessing only (no extra prompt model).")
     return PromptNormalizer(
-        vlm=None,
-        processor=None,
-        device=device,
         fallback_passthrough=True,
         fallback_robot_order=fallback_robot_order,
     )
@@ -1239,8 +1225,6 @@ def run_task2(args: argparse.Namespace) -> None:
         None
         if args.skip_task2_normalization
         else _load_normalizer(
-            _resolve_device(args.device),
-            enable_vlm_fallback=args.enable_vlm_fallback,
             fallback_robot_order=fallback_robot_order,
         )
     )
@@ -1390,8 +1374,6 @@ def _add_common_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--strategy-type",   default=STRATEGY_TYPE)
     p.add_argument("--duration",        type=int, default=20,
                    help="Rollout duration in seconds.")
-    p.add_argument("--enable-vlm-fallback", action="store_true",
-                   help="Disabled for eval deployment; kept only to reject legacy/offline VLM fallback explicitly.")
     p.add_argument("--device",          default=DEVICE,
                    help="Device for policy. Default: env LEROBOT_DEVICE or auto.")
     p.add_argument("--display-data",    dest="display_data", action="store_true", default=DISPLAY_DATA,
@@ -1486,13 +1468,6 @@ def main() -> None:
         sys.exit(2)
     if args.skip_task2_normalization and not args.dry_run:
         print("error: --skip-task2-normalization is only allowed with --dry-run", file=sys.stderr)
-        sys.exit(2)
-    if args.enable_vlm_fallback:
-        print(
-            "error: --enable-vlm-fallback is disabled for eval deployment; "
-            "prompt preprocessing uses deterministic rules only.",
-            file=sys.stderr,
-        )
         sys.exit(2)
     if args.duration <= 0:
         print("error: --duration must be > 0", file=sys.stderr)

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Offline prompt-normalizer smoke test for the banana/bowl eval tasks.
 
-This script is intentionally outside the deployment path. By default it uses
-only the deterministic prompt normalizer. Pass --model-id only for legacy
-offline VLM fallback experiments.
+This script is intentionally outside the deployment path and uses only the
+deterministic prompt normalizer.
 """
 
 from __future__ import annotations
@@ -66,25 +65,12 @@ def main() -> None:
         default=",".join(DEFAULT_ROBOT_ORDER),
         help="Robot-perspective fallback bowl order, e.g. blue,red,green.",
     )
-    parser.add_argument(
-        "--model-id",
-        default=None,
-        help="Optional standalone SmolVLM model id for legacy/offline fallback.",
-    )
-    parser.add_argument("--device", default="cuda", help="Device for optional standalone SmolVLM fallback.")
     parser.add_argument("--category", default=None, help="Run only one category.")
     args = parser.parse_args()
 
     frame = Image.open(args.image).convert("RGB")
     fallback_order = _parse_order(args.fallback_robot_order)
-    if args.model_id:
-        normalizer = PromptNormalizer.from_pretrained(
-            args.model_id,
-            device=args.device,
-            fallback_robot_order=fallback_order,
-        )
-    else:
-        normalizer = PromptNormalizer(fallback_robot_order=fallback_order)
+    normalizer = PromptNormalizer(fallback_robot_order=fallback_order)
 
     prompts = [case for case in PROMPTS if args.category is None or case.category == args.category]
     if not prompts:

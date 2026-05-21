@@ -124,6 +124,10 @@ TASK2_CASES = [
     "put banana in the bowl adjacent to the rightmost bowl",
     "put banana in the bowl next to the middle bowl on the right",
     "put banana in the bowl next to the middle bowl on the left",
+    "put it to the 2nd left of the green",
+    "put it to the second left of the avocado colored bowl",
+    "put it two bowls to the right of the blue",
+    "put it to the 2nd right of the sky colored bowl",
 
     # Between / separator / adjacent to both
     "put banana in the bowl between blue and green",
@@ -162,6 +166,10 @@ TASK2_CASES = [
     "put banana in the bowl that is not avocado colored and not leftmost",
     "put banana in the bowl that is neither sky colored nor middle",
     "put banana in the bowl that is not grass colored and not rightmost",
+    "put it to the right of not blue not avocado",
+    "put it to the left of not sky not avocado",
+    "put it to the second left of not red not blue",
+    "put it two bowls right of not blood not grass",
 
     # Color analogies as direct targets
     "put banana in the color of grass bowl",

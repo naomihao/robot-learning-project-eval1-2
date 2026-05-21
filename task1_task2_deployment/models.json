@@ -1,6 +1,6 @@
 {
   "models": {
     "task1": "RobotLearningVLA/test_eval1_v3_source_only",
-    "task2": "RobotLearningVLA/test_eval2_v1"
+    "task2": "RobotLearningVLA/test_eval1_v3_source_only"
   }
 }

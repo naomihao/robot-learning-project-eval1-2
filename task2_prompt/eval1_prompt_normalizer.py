@@ -21,10 +21,8 @@ Prompts fall into two fundamentally different categories:
        "bowl on the right of the red bowl"
      Handled by HSV color segmentation, then deterministic spatial rules.
 
-Deterministic language/spatial parsing is always attempted before touching any
-model. A legacy standalone SmolVLM fallback remains in this module for offline
-experiments, but the deployment CLI rejects it so eval-day rollouts use only the
-VLA policy plus deterministic prompt preprocessing.
+Eval-day prompt preprocessing is deterministic: no extra language or vision
+model is loaded to interpret the prompt.
 
 Camera perspective (spatial prompts only)
 ------------------------------------------
@@ -377,6 +375,17 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
     has_robot_ctx = True
 
     number_words = {"one": 0, "two": 1, "three": 2}
+    ordinal_words = {
+        "first": 1,
+        "1st": 1,
+        "one": 1,
+        "second": 2,
+        "2nd": 2,
+        "two": 2,
+        "third": 3,
+        "3rd": 3,
+        "three": 3,
+    }
 
     def _neighbor_of(color: str, side: str) -> str | None:
         idx = robot.index(color)
@@ -400,6 +409,73 @@ def _try_spatial(prompt: str, robot_order: tuple[str, str, str]) -> str | None:
             return None
         target_idx = idx + (1 if side == "right" else -1)
         return robot[target_idx] if 0 <= target_idx < len(robot) else None
+
+    def _distance(label: str | None) -> int:
+        if not label:
+            return 1
+        label = label.lower()
+        if label.isdigit():
+            return int(label)
+        return ordinal_words[label]
+
+    def _clean_landmark_phrase(phrase: str) -> str:
+        phrase = re.sub(r"\bfrom\s+(?:the\s+)?(?:robot|arm)(?:'s)?\s+(?:perspective|view|side)\b.*", "", phrase)
+        phrase = re.sub(r"\b(?:colored?|coloured?)\b", "", phrase)
+        phrase = re.sub(r"\b(?:bowl|bowel|one|cup|container|dish|target)\b", "", phrase)
+        phrase = re.sub(r"[^a-z0-9\s-]", " ", phrase)
+        return re.sub(r"\s+", " ", phrase).strip()
+
+    def _resolve_landmark_phrase(phrase: str) -> str | None:
+        landmark = _clean_landmark_phrase(phrase)
+        if not landmark:
+            return None
+
+        idx = _position_idx(landmark)
+        if idx is not None:
+            return robot[idx]
+
+        # Handles landmarks like "not blue not avocado" by first normalizing
+        # avocado/sky/tomato/etc. to their bowl colors, then applying negation.
+        color = _try_negation(landmark)
+        if color:
+            return color
+
+        for resolver in (_try_direct, _try_analogy, _try_single_target_color):
+            color = resolver(landmark)
+            if color:
+                return color
+
+        mentions = _find_color_mentions(landmark)
+        unique = list(dict.fromkeys(mentions))
+        return unique[0] if len(unique) == 1 else None
+
+    def _relative_from_landmark(side: str, landmark_phrase: str, distance: int = 1) -> str | None:
+        landmark = _resolve_landmark_phrase(landmark_phrase)
+        if landmark is None:
+            return None
+        idx = robot.index(landmark)
+        target_idx = idx + (distance if side == "right" else -distance)
+        return robot[target_idx] if 0 <= target_idx < len(robot) else None
+
+    # ── Relative with an optional ordinal distance and a derived landmark.
+    # Covers:
+    #   "2nd left of green"                  -> two bowls left of green
+    #   "second bowl to the right of blue"   -> two bowls right of blue
+    #   "right of not blue not avocado"      -> right of the only non-blue/non-green bowl
+    ordinal = r"(?P<n>first|1st|one|second|2nd|two|third|3rd|three|\d+)"
+    landmark = (
+        r"(?P<landmark>.+?)(?=\s*(?:\bfrom\s+(?:the\s+)?(?:robot|arm)(?:'s)?\s+"
+        r"(?:perspective|view|side)\b|[,.!?;()]|$))"
+    )
+    m = re.search(
+        rf"\b(?:on|to|at|in)?\s*(?:the\s+)?"
+        rf"(?:(?:{ordinal})\s+(?:bowl|one|spot|position|place)?s?\s*(?:to\s+the\s+)?)?"
+        rf"(?P<side>right|left)(?:\s+side)?\s+of\s+(?:the\s+)?{landmark}",
+        lower,
+    )
+    if m and has_robot_ctx:
+        dist = _distance(m.group("n"))
+        return _relative_from_landmark(m.group("side"), m.group("landmark"), dist)
 
     # ── Absolute ordinal from left ────────────────────────────────────────────
     m = re.search(
@@ -853,6 +929,9 @@ def _try_negation(prompt: str) -> str | None:
       "not associated with danger or the sea"        → green  (concept: danger=red, sea=blue)
     """
     lower = _normalize_spatial_landmarks(prompt)
+    if _POSITION_WORD_RE.search(lower):
+        return None
+
     excluded: set[str] = set()
 
     # Strategy: for every negative-marker position, collect all bowl colors
@@ -946,25 +1025,9 @@ def normalize_prompt_text(
     if fallback_passthrough:
         return raw_prompt
     raise ValueError(
-        "Cannot normalize prompt without bowl layout or VLM fallback: "
+        "Cannot normalize prompt without bowl layout: "
         f"{raw_prompt!r}. Use a color prompt, a two-color negation, or a supported spatial prompt."
     )
-
-
-# ── VLM prompt (spatial reasoning only; legacy/offline fallback) ──────────────
-
-_SPATIAL_PROMPT = """You are helping a robot choose one target bowl for a banana.
-
-There are exactly three possible bowl colors: red, green, and blue.
-Use the image and the instruction to decide which single bowl is requested.
-Reply with a short explanation and finish with exactly one line:
-
-ANSWER: red
-ANSWER: green
-ANSWER: blue
-
-Instruction: {raw_prompt}
-"""
 
 
 # ── HSV layout detection ──────────────────────────────────────────────────────
@@ -1077,79 +1140,25 @@ def _complete_robot_order(
     return min(candidates, key=lambda item: item[0])[1]
 
 
-def _extract_color_from_reasoning(text: str) -> str | None:
-    """Extract the final red/green/blue answer from legacy VLM text output."""
-    match = re.search(r"\bANSWER\s*:\s*(red|green|blue)\b", text, flags=re.IGNORECASE)
-    if match:
-        return match.group(1).lower()
-    mentions = _find_color_mentions(text)
-    return mentions[-1] if mentions else None
-
-
 class PromptNormalizer:
     """Translates an Eval1/Eval2 instruction to a canonical color prompt.
 
-    Text is handled by deterministic rules first. Task2 spatial prompts use HSV
-    color segmentation to infer the red/green/blue bowl order. A legacy/offline
-    VLM fallback can be supplied explicitly, but deployment passes ``vlm=None``.
+    Text is handled by deterministic rules. Task2 spatial prompts use HSV color
+    segmentation to infer the red/green/blue bowl order.
     """
 
     def __init__(
         self,
         *,
-        vlm=None,
-        processor=None,
-        device: str = "cuda",
-        max_new_tokens: int = 64,
         fallback_passthrough: bool = True,
         fallback_robot_order: tuple[str, str, str] | None = DEFAULT_ROBOT_ORDER,
     ) -> None:
-        self._vlm = vlm
-        self._processor = processor
-        self._device = device
-        self._max_new_tokens = max_new_tokens
         self._fallback_passthrough = fallback_passthrough
         self._fallback_robot_order = (
             validate_robot_order(fallback_robot_order) if fallback_robot_order is not None else None
         )
         # Detected bowl layout: robot perspective L→R, set by detect_layout().
         self._robot_order: tuple[str, str, str] | None = None
-
-    @classmethod
-    def from_policy(cls, policy, device: str | None = None, **kwargs) -> "PromptNormalizer":
-        """Use a policy's embedded SmolVLM for offline experiments."""
-        policy_model = getattr(policy, "model", None)
-        vlm_with_expert = getattr(policy_model, "vlm_with_expert", None)
-        vlm = getattr(vlm_with_expert, "vlm", None)
-        processor = getattr(vlm_with_expert, "processor", None)
-        if processor is None:
-            processor = getattr(policy, "processor", None)
-        if vlm is None or processor is None:
-            raise AttributeError("Policy does not expose a VLM and processor for prompt normalization")
-        if device is None:
-            device = getattr(getattr(policy, "config", None), "device", "cuda")
-        return cls(vlm=vlm, processor=processor, device=device, **kwargs)
-
-    @classmethod
-    def from_pretrained(
-        cls,
-        model_id: str = "HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
-        device: str = "cuda",
-        **kwargs,
-    ) -> "PromptNormalizer":
-        """Load a standalone SmolVLM normalizer for legacy/offline experiments."""
-        from transformers import AutoModelForImageTextToText, AutoProcessor
-
-        model_kwargs = {}
-        if torch is not None and str(device).startswith("cuda"):
-            model_kwargs["torch_dtype"] = torch.float16
-        vlm = AutoModelForImageTextToText.from_pretrained(model_id, **model_kwargs)
-        if hasattr(vlm, "to"):
-            vlm.to(device)
-        if hasattr(vlm, "eval"):
-            vlm.eval()
-        processor = AutoProcessor.from_pretrained(model_id)
-        return cls(vlm=vlm, processor=processor, device=device, **kwargs)
 
     def detect_layout(
         self,
@@ -1278,59 +1287,15 @@ class PromptNormalizer:
                 logging.info("[PromptNormalizer] neg+spatial %r → %r", raw_prompt, canonical)
                 return canonical
 
-        if self._vlm is None or self._processor is None:
-            robot_order = self._robot_order or self._fallback_robot_order
-            canonical, reason = normalize_prompt_best_effort(raw_prompt, robot_order=robot_order)
-            logging.warning(
-                "[PromptNormalizer] best-effort fallback (%s) %r → %r",
-                reason,
-                raw_prompt,
-                canonical,
-            )
-            return canonical
-
-        logging.info("[PromptNormalizer] VLM fallback for %r", raw_prompt)
-        return self._vlm_normalize(image, raw_prompt)
-
-    def _vlm_normalize(
-        self,
-        image: Union[np.ndarray, "Image.Image", "torch.Tensor"],
-        raw_prompt: str,
-    ) -> str:
-        """Legacy/offline image-language fallback. Deployment does not call this."""
-        if torch is None:
-            raise ImportError("PyTorch is required for VLM prompt normalization")
-        pil_image = _to_pil(image)
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image"},
-                    {"type": "text", "text": _SPATIAL_PROMPT.format(raw_prompt=raw_prompt)},
-                ],
-            }
-        ]
-        prompt = self._processor.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True,
+        robot_order = self._robot_order or self._fallback_robot_order
+        canonical, reason = normalize_prompt_best_effort(raw_prompt, robot_order=robot_order)
+        logging.warning(
+            "[PromptNormalizer] best-effort fallback (%s) %r → %r",
+            reason,
+            raw_prompt,
+            canonical,
         )
-        inputs = self._processor(text=prompt, images=[pil_image], return_tensors="pt")
-        if hasattr(inputs, "to"):
-            inputs = inputs.to(self._device)
-        with torch.inference_mode():
-            generated_ids = self._vlm.generate(
-                **inputs,
-                max_new_tokens=self._max_new_tokens,
-            )
-
-        input_len = inputs["input_ids"].shape[-1]
-        generated_ids = generated_ids[:, input_len:]
-        text = self._processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        color = _extract_color_from_reasoning(text)
-        if color is None:
-            raise ValueError(f"VLM fallback did not return a bowl color: {text!r}")
-        return canonical_prompt(color)
+        return canonical
 
     def __call__(
         self,
@@ -1362,12 +1327,6 @@ Examples:
     ap.add_argument("image", help="Path to a camera frame image (PNG/JPG).")
     ap.add_argument("prompt", help="Complex task prompt to normalize.")
     ap.add_argument(
-        "--model-id",
-        default=None,
-        help="Optional standalone SmolVLM model id for legacy/offline fallback.",
-    )
-    ap.add_argument("--device", default="cuda", help="Device for optional standalone SmolVLM fallback.")
-    ap.add_argument(
         "--fallback-robot-order",
         default=",".join(DEFAULT_ROBOT_ORDER),
         help="Robot-perspective fallback bowl order, e.g. blue,red,green.",
@@ -1377,11 +1336,7 @@ Examples:
     if Image is None:
         raise ImportError("Pillow is required to load the test image")
     fallback_order = tuple(part.strip().lower() for part in args.fallback_robot_order.split(","))
-    normalizer_kwargs = {"fallback_robot_order": validate_robot_order(fallback_order)}
-    if args.model_id:
-        normalizer = PromptNormalizer.from_pretrained(args.model_id, device=args.device, **normalizer_kwargs)
-    else:
-        normalizer = PromptNormalizer(**normalizer_kwargs)
+    normalizer = PromptNormalizer(fallback_robot_order=validate_robot_order(fallback_order))
     img = Image.open(args.image)
     result = normalizer.normalize(img, args.prompt)
     print(result)
