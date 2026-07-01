@@ -16,7 +16,7 @@ and **Eval 2** (compositional/spatial instruction) setups.
 
 Constraints from the project spec: single camera, VLA-only policy (no auxiliary LLM/VLM/YOLO/face-recognition
 models at inference time), 20 s per rollout, ±5 cm object placement tolerance. See the full brief in
-[`P1-VLA.docx`](../P1-VLA.docx).
+(https://docs.google.com/document/d/1YsQ_Qe4vEwDp1dJdqn3l9vSt7oJBkc6JazjbmWLxAXg/edit?tab=t.0)
 
 ## How it works
 
