@@ -144,12 +144,22 @@ python task2_prompt/test_prompt_normalizer.py
 
 ```bash
 # Task 1
-./task1_task2_deployment/run_eval.sh task1 --task "Put the banana in the red colored bowl."
+python3 task1_task2_deployment/run_eval.py task1 \
+  --interactive \
+  --duration 20 \ 
+  --camera-index 0 \
+  --device cpu
+command example "Put the banana in the red colored bowl."
 
 # Task 2 — prompt resolved from a live camera frame each rollout
-./task1_task2_deployment/run_eval.sh task2 \
-  --task "Put the banana into the bowl that is not green and not blue" \
-  --n-rollouts 3
+python3 task1_task2_deployment/run_eval.py task1 \
+  --interactive \
+  --duration 20 \ 
+  --camera-index 0 \
+  --device cpu
+
+command example "Put the banana into the bowl that is not avacado colored and not sky colored bowl" \
+
 
 # TA-facing interactive session, model loaded once
 ./task1_task2_deployment/run_eval.sh task2 --interactive --backend persistent --duration 20
